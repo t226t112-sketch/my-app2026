@@ -1,0 +1,2211 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  BookOpen, 
+  Plus, 
+  Calendar, 
+  Sparkles, 
+  PieChart, 
+  Settings, 
+  Smile, 
+  Meh, 
+  Frown, 
+  Clock, 
+  DollarSign, 
+  Compass, 
+  MapPin, 
+  Home, 
+  CheckCircle, 
+  Trash2, 
+  Loader2, 
+  ChevronRight,
+  AlertCircle,
+  Wallet,
+  ArrowUpRight,
+  ArrowDownRight,
+  Heart,
+  Volume2,
+  VolumeX,
+  Play,
+  Pause,
+  Music,
+  ShoppingBag,
+  Gift
+} from 'lucide-react';
+
+// 🐈 ヘッダー用の可愛い猫ちゃん（SVG）
+const CatIcon = ({ className = "w-6 h-6" }) => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M12 5c.67 0 1.35.09 2 .26 1.78-1.38 2.5-1.11 2.5-1.11.45.9 0 2.2 0 2.2.78.88 1.5 2 1.5 3.14 0 4.14-2.5 5.5-5 5.5s-5-1.36-5-5.5c0-1.14.72-2.26 1.5-3.14 0 0-.45-1.3 0-2.2 0 0 .72-.27 2.5 1.11.65-.17 1.33-.26 2-.26z" />
+    <path d="M12 18c-3.1 0-6-1.5-6-4.5 0-1.2.5-2 1.5-2.5" />
+    <path d="M12 18c3.1 0 6-1.5 6-4.5 0-1.2-.5-2-1.5-2.5" />
+    <circle cx="9.5" cy="11.5" r="1.5" fill="currentColor" />
+    <circle cx="14.5" cy="11.5" r="1.5" fill="currentColor" />
+    <path d="M12 14v1.5" />
+    <path d="M10.5 15.5c.5.5 1.5.5 3 0" />
+  </svg>
+);
+
+// 🐾 肉球アイコン
+const PawIcon = ({ className = "w-5 h-5" }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <circle cx="12" cy="7" r="3" />
+    <circle cx="6.5" cy="11.5" r="2.5" />
+    <circle cx="17.5" cy="11.5" r="2.5" />
+    <circle cx="9.5" cy="18" r="2" />
+    <circle cx="14.5" cy="18" r="2" />
+  </svg>
+);
+
+// 🎨 着せ替えアイテムを重ねて描画できるおうちの「みけちゃん」SVGグラフィック
+const CozyCatArt = ({ equipped = {} }) => (
+  <svg viewBox="0 0 200 200" className="w-40 h-40 md:w-48 md:h-48 drop-shadow-md" xmlns="http://www.w3.org/2000/svg">
+    {/* 背景のやわらかい陽だまりサークル */}
+    <circle cx="100" cy="100" r="85" fill="#FFEFE2" />
+    <circle cx="100" cy="100" r="75" fill="#FFF6EE" />
+    
+    {/* お星様 */}
+    <path d="M40,50 L43,55 L49,56 L44,60 L46,66 L40,62 L34,66 L36,60 L31,56 L37,55 Z" fill="#FCD34D" />
+    <path d="M165,130 L167,133 L172,134 L168,137 L169,142 L165,139 L161,142 L162,137 L158,134 L163,133 Z" fill="#FCD34D" />
+    <circle cx="150" cy="50" r="3" fill="#FCA5A5" />
+    <circle cx="50" cy="150" r="4" fill="#93C5FD" />
+
+    {/* 毛糸玉 */}
+    <circle cx="145" cy="150" r="16" fill="#FCA5A5" />
+    <path d="M135,140 Q145,160 155,140" stroke="#FFF" strokeWidth="2" fill="none" />
+    <path d="M130,150 Q145,135 160,150" stroke="#FFF" strokeWidth="2" fill="none" />
+    {/* ほどけた毛糸 */}
+    <path d="M158,158 Q170,165 175,155 T190,165" stroke="#FCA5A5" strokeWidth="3" fill="none" strokeLinecap="round" />
+
+    {/* 三毛猫のしっぽ */}
+    <path d="M75,145 Q60,155 45,140 T42,110" stroke="#D97706" strokeWidth="16" fill="none" strokeLinecap="round" />
+    <path d="M75,145 Q60,155 45,140 T42,110" stroke="#78350F" strokeWidth="16" strokeDasharray="15 35" fill="none" strokeLinecap="round" />
+
+    {/* 猫のからだ（もっちり丸型） */}
+    <ellipse cx="100" cy="120" rx="45" ry="38" fill="#FFF" />
+    {/* 三毛猫のぶち（背中） */}
+    <path d="M75,95 C65,105 60,120 70,135 C80,135 85,120 80,100 Z" fill="#F59E0B" />
+    <path d="M120,95 C135,100 140,115 130,135 C120,135 115,120 118,100 Z" fill="#4B5563" />
+
+    {/* 猫のあたま */}
+    <ellipse cx="100" cy="85" rx="36" ry="30" fill="#FFF" />
+    
+    {/* 三毛猫のぶち（顔） */}
+    <path d="M68,75 C64,85 70,100 80,95 C82,80 75,70 68,75 Z" fill="#F59E0B" />
+    <path d="M132,75 C136,85 130,100 120,95 C118,80 125,70 132,75 Z" fill="#4B5563" />
+
+    {/* みぎ耳 */}
+    <path d="M120,65 L138,42 C140,39 144,42 142,46 L128,75 Z" fill="#4B5563" />
+    <path d="M124,66 L134,48 C135,46 137,48 136,50 L128,70 Z" fill="#FCA5A5" />
+
+    {/* ひだり耳 */}
+    <path d="M80,65 L62,42 C60,39 56,42 58,46 L72,75 Z" fill="#F59E0B" />
+    <path d="M76,66 L66,48 C65,46 63,48 64,50 L72,70 Z" fill="#FCA5A5" />
+
+    {/* おめめ（まったり細めて眠っている） */}
+    <path d="M78,85 Q86,91 90,85" stroke="#1F2937" strokeWidth="3" fill="none" strokeLinecap="round" />
+    <path d="M122,85 Q114,91 110,85" stroke="#1F2937" strokeWidth="3" fill="none" strokeLinecap="round" />
+
+    {/* ピンクのほっぺ */}
+    <ellipse cx="74" cy="92" rx="6" ry="4" fill="#FCA5A5" opacity="0.8" />
+    <ellipse cx="126" cy="92" rx="6" ry="4" fill="#FCA5A5" opacity="0.8" />
+
+    {/* お鼻とお口 */}
+    <polygon points="100,90 97,87 103,87" fill="#FCA5A5" />
+    <path d="M100,90 Q97,95 94,93" stroke="#1F2937" strokeWidth="2" fill="none" strokeLinecap="round" />
+    <path d="M100,90 Q103,95 106,93" stroke="#1F2937" strokeWidth="2" fill="none" strokeLinecap="round" />
+
+    {/* ひげ */}
+    <path d="M68,91 L50,89" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M66,95 L48,96" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M132,91 L150,89" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M134,95 L152,96" stroke="#1F2937" strokeWidth="1.5" strokeLinecap="round" />
+
+    {/* まあるい手前あし */}
+    <circle cx="86" cy="140" r="9" fill="#FFF" />
+    <circle cx="114" cy="140" r="9" fill="#FFF" />
+    {/* おてての線 */}
+    <path d="M86,131 L86,145" stroke="#E5E7EB" strokeWidth="1.5" />
+    <path d="M114,131 L114,145" stroke="#E5E7EB" strokeWidth="1.5" />
+
+    {/* 🎀 【アクセサリー：赤いリボン】 🎀 */}
+    {equipped.red_ribbon && (
+      <g>
+        <circle cx="100" cy="107" r="7" fill="#EF4444" />
+        <path d="M100,107 L85,97 L88,115 Z" fill="#DC2626" />
+        <path d="M100,107 L115,97 L112,115 Z" fill="#DC2626" />
+        <path d="M96,113 L88,128" stroke="#EF4444" strokeWidth="4" strokeLinecap="round" />
+        <path d="M104,113 L112,128" stroke="#EF4444" strokeWidth="4" strokeLinecap="round" />
+      </g>
+    )}
+
+    {/* 👓 【アクセサリー：かっこいいメガネ】 👓 */}
+    {equipped.glasses && (
+      <g>
+        <circle cx="82" cy="85" r="11" stroke="#1E293B" strokeWidth="3" fill="none" />
+        <circle cx="118" cy="85" r="11" stroke="#1E293B" strokeWidth="3" fill="none" />
+        <line x1="93" y1="85" x2="107" y2="85" stroke="#1E293B" strokeWidth="3" />
+        <path d="M71,85 L65,78" stroke="#1E293B" strokeWidth="2.5" />
+        <path d="M129,85 L135,78" stroke="#1E293B" strokeWidth="2.5" />
+      </g>
+    )}
+
+    {/* 🍓 【アクセサリー：いちご帽子】 🍓 */}
+    {equipped.strawberry_hat && (
+      <g>
+        <path d="M68,64 Q100,28 132,64 Q100,75 68,64 Z" fill="#EF4444" />
+        <path d="M100,40 L102,28" stroke="#059669" strokeWidth="4" strokeLinecap="round" />
+        <path d="M96,38 Q100,34 104,38" fill="#10B981" />
+        {/* いちごのつぶつぶ */}
+        <circle cx="85" cy="50" r="1.5" fill="#FCD34D" />
+        <circle cx="100" cy="48" r="1.5" fill="#FCD34D" />
+        <circle cx="115" cy="50" r="1.5" fill="#FCD34D" />
+        <circle cx="92" cy="58" r="1.5" fill="#FCD34D" />
+        <circle cx="108" cy="58" r="1.5" fill="#FCD34D" />
+      </g>
+    )}
+  </svg>
+);
+
+// ✍️🐈 日記を一生懸命書いている可愛いみけちゃんの着せ替え対応SVG
+const WritingCatArt = ({ equipped = {} }) => (
+  <svg viewBox="0 0 140 120" className="w-24 h-24 md:w-28 md:h-28 drop-shadow-xs" xmlns="http://www.w3.org/2000/svg">
+    {/* 背景の小さなぽかぽかサークル */}
+    <circle cx="70" cy="65" r="50" fill="#FFF1E6" />
+
+    {/* 日記帳 */}
+    <path d="M25,85 L65,78 L105,85 L105,108 L65,102 L25,108 Z" fill="#FFFFFF" stroke="#E5E7EB" strokeWidth="2" />
+    <path d="M65,78 L65,102" stroke="#E5E7EB" strokeWidth="2" strokeDasharray="2 2" />
+    <path d="M35,90 L55,87" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M33,96 L55,93" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M75,87 L95,90" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
+    <path d="M75,93 L97,96" stroke="#9CA3AF" strokeWidth="1.5" strokeLinecap="round" />
+
+    {/* 猫のからだ */}
+    <ellipse cx="70" cy="80" rx="32" ry="26" fill="#FFFFFF" />
+    <path d="M50,70 C42,75 45,90 55,92 Z" fill="#F59E0B" />
+    <path d="M85,68 C92,72 90,88 80,92 Z" fill="#4B5563" />
+
+    {/* 猫のあたま */}
+    <ellipse cx="70" cy="50" rx="28" ry="24" fill="#FFFFFF" />
+    <path d="M46,42 C42,48 46,60 54,58 Z" fill="#F59E0B" />
+    <path d="M94,42 C98,48 94,60 86,58 Z" fill="#4B5563" />
+
+    {/* ひだり耳 */}
+    <path d="M52,36 L36,16 C34,14 38,15 40,18 L48,32 Z" fill="#F59E0B" />
+    <path d="M48,34 L38,22 C37,20 39,21 38,23 L45,32 Z" fill="#FCA5A5" />
+
+    {/* みぎ耳 */}
+    <path d="M88,36 L104,16 C106,14 102,15 100,18 L92,32 Z" fill="#4B5563" />
+    <path d="M92,34 L102,22 C103,20 101,21 102,23 L95,32 Z" fill="#FCA5A5" />
+
+    {/* おめめ */}
+    <path d="M52,50 L58,54 L52,58" stroke="#1F2937" strokeWidth="2.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M88,50 Q81,56 76,51" stroke="#1F2937" strokeWidth="2.5" fill="none" strokeLinecap="round" />
+
+    {/* ピンクのほっぺ */}
+    <ellipse cx="48" cy="58" rx="5" ry="3" fill="#FCA5A5" opacity="0.8" />
+    <ellipse cx="90" cy="58" rx="5" ry="3" fill="#FCA5A5" opacity="0.8" />
+
+    {/* お鼻とお口 */}
+    <polygon points="70,55 68,53 72,53" fill="#FCA5A5" />
+    <path d="M70,55 Q68,59 66,57" stroke="#1F2937" strokeWidth="2" fill="none" strokeLinecap="round" />
+    <path d="M70,55 Q72,59 74,57" stroke="#1F2937" strokeWidth="2" fill="none" strokeLinecap="round" />
+
+    {/* ひげ */}
+    <path d="M44,56 L30,55" stroke="#1F2937" strokeWidth="1.2" />
+    <path d="M43,60 L29,62" stroke="#1F2937" strokeWidth="1.2" />
+    <path d="M96,56 L110,55" stroke="#1F2937" strokeWidth="1.2" />
+    <path d="M97,60 L111,62" stroke="#1F2937" strokeWidth="1.2" />
+
+    {/* おてて＆鉛筆 */}
+    <circle cx="48" cy="84" r="7" fill="#FFFFFF" stroke="#E5E7EB" strokeWidth="1" />
+    <circle cx="82" cy="80" r="7" fill="#FFFFFF" stroke="#E5E7EB" strokeWidth="1" />
+    <path d="M82,78 L96,62 L102,68 L88,84 Z" fill="#FCD34D" />
+    <polygon points="82,78 75,85 88,84" fill="#FCA5A5" />
+    <circle cx="77" cy="83" r="1.5" fill="#1F2937" />
+
+    {/* 🎀 赤いリボン 🎀 */}
+    {equipped.red_ribbon && (
+      <g>
+        <circle cx="70" cy="68" r="5" fill="#EF4444" />
+        <path d="M70,68 L58,61 L60,74 Z" fill="#DC2626" />
+        <path d="M70,68 L82,61 L80,74 Z" fill="#DC2626" />
+      </g>
+    )}
+
+    {/* 👓 かっこいいメガネ 👓 */}
+    {equipped.glasses && (
+      <g>
+        <circle cx="56" cy="52" r="8" stroke="#1E293B" strokeWidth="2.5" fill="none" />
+        <circle cx="82" cy="52" r="8" stroke="#1E293B" strokeWidth="2.5" fill="none" />
+        <line x1="64" y1="52" x2="74" y2="52" stroke="#1E293B" strokeWidth="2.5" />
+      </g>
+    )}
+
+    {/* 🍓 いちご帽子 🍓 */}
+    {equipped.strawberry_hat && (
+      <g>
+        <path d="M45,34 Q70,5 95,34 Q70,43 45,34 Z" fill="#EF4444" />
+        <path d="M70,16 L72,8" stroke="#059669" strokeWidth="3" strokeLinecap="round" />
+        {/* つぶつぶ */}
+        <circle cx="58" cy="24" r="1" fill="#FCD34D" />
+        <circle cx="70" cy="22" r="1" fill="#FCD34D" />
+        <circle cx="82" cy="24" r="1" fill="#FCD34D" />
+      </g>
+    )}
+  </svg>
+);
+
+export default function App() {
+  // アプリの状態管理
+  const [activeTab, setActiveTab] = useState('diary'); // 'diary', 'wallet', 'plan', 'history', 'stats', 'shop'
+  const [apiKey, setApiKey] = useState('');
+  const [diaries, setDiaries] = useState([]);
+  const [plans, setPlans] = useState([]);
+  const [showConfig, setShowConfig] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
+
+  // --- お魚資金（お財布）データ状態 ---
+  const [balance, setBalance] = useState(50000); 
+  const [monthlyBudget, setMonthlyBudget] = useState(30000); 
+  const [transactions, setTransactions] = useState([]); 
+  
+  // 収支入力フォーム
+  const [txType, setTxType] = useState('expense'); 
+  const [txAmount, setTxAmount] = useState('');
+  const [txDesc, setTxDesc] = useState('');
+  const [txCategory, setTxCategory] = useState('entertainment');
+
+  // --- 🐾 気分カラー＆スタンプ定義 (getMoodConfig) 🐾 ---
+  const getMoodConfig = (mood) => {
+    switch (mood) {
+      case 'happy':
+        return { emoji: "😺", bg: 'bg-emerald-50 border-emerald-200 text-emerald-800', text: 'ご機嫌ルンルンにゃ', labelColor: 'bg-emerald-500 text-white' };
+      case 'tired':
+        return { emoji: "😿", bg: 'bg-amber-50 border-amber-200 text-amber-800', text: 'お疲れだらーんにゃ', labelColor: 'bg-amber-500 text-white' };
+      case 'sad':
+        return { emoji: "🥺", bg: 'bg-blue-50 border-blue-200 text-blue-800', text: 'しょんぼりにゃん', labelColor: 'bg-blue-500 text-white' };
+      case 'normal':
+      default:
+        return { emoji: "😸", bg: 'bg-orange-50 border-orange-200 text-orange-800', text: 'まったり通常運転にゃ', labelColor: 'bg-orange-400 text-white' };
+    }
+  };
+
+  // --- お部屋のみけちゃんとなつきレベルのセリフ 🐾 ---
+  const getCatAffectionMessage = () => {
+    if (affectionLevel === 1) {
+      return "「あ、日記を書いてくれたにゃ？まだちょっと照れくさいけど、お部屋にいてくれると嬉しいにゃん🐾」";
+    } else if (affectionLevel === 2) {
+      return "「おかえりにゃ！きょうもお財布に優しくがんばったにゃ？えらいえらいにゃ、よしよししてあげるにゃ🐾」";
+    } else if (affectionLevel === 3) {
+      return "「ニャーーーン！ずっと待ってたにゃ！きょうの日記も早くみけに聞かせてにゃ🐾 お膝の上でゴロゴロさせてにゃん❤️」";
+    } else {
+      return "「もう、あなた無しでは生きていけないにゃ🐾 みけにとって、あなたが世界でいちばん大好きなご主人様にゃん❤️」";
+    }
+  };
+
+  // --- お財布（お魚資金）データ計算 ---
+  const getWalletStats = () => {
+    const currentMonth = new Date().toISOString().substring(0, 7);
+    const thisMonthTxs = transactions.filter(t => t.date && t.date.startsWith(currentMonth));
+    const totalIncome = thisMonthTxs.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const totalExpense = thisMonthTxs.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    const remainingBudget = monthlyBudget - totalExpense;
+
+    return { totalIncome, totalExpense, remainingBudget, currentMonth };
+  };
+
+  const walletStats = getWalletStats();
+
+  // 日記フォーム（大きめUI用）
+  const [newDiaryText, setNewDiaryText] = useState('');
+  const [selectedMood, setSelectedMood] = useState('normal'); 
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [diaryViewMode, setDiaryViewMode] = useState('list'); // 'list' | 'calendar'
+
+  // 統計・カレンダー用状態
+  const [currentCalDate, setCurrentCalDate] = useState(new Date());
+
+  // 暇つぶしプラン提案フォーム
+  const [duration, setDuration] = useState('1h'); 
+  const [category, setCategory] = useState('any'); 
+  const [customMood, setCustomMood] = useState('normal');
+  const [additionalRequest, setAdditionalRequest] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generatedSuggestions, setGeneratedSuggestions] = useState([]);
+
+  // デイリーにゃんこ提案状態
+  const [dailySuggestion, setDailySuggestion] = useState(null);
+  const [isGeneratingDaily, setIsGeneratingDaily] = useState(false);
+
+  // 猫キャラのパーソナリティ
+  const catNames = ["みけ店長", "たま監督", "くろ助", "シロお嬢様"];
+  const [activeCat, setActiveCat] = useState("みけ店長");
+
+  // --- 💖 にゃんとなつき度 ＆ 🪙 またたびコイン ＆ 🛍️ ショップシステム 💖 ---
+  const [matatabiCoins, setMatatabiCoins] = useState(100); // 初期コイン
+  const [affectionPoints, setAffectionPoints] = useState(25); // なつき度ポイント
+  const [purchasedItems, setPurchasedItems] = useState({
+    strawberry_hat: false,
+    red_ribbon: false,
+    glasses: false
+  });
+  const [equippedItems, setEquippedItems] = useState({
+    strawberry_hat: false,
+    red_ribbon: false,
+    glasses: false
+  });
+
+  // おみくじガチャ状態
+  const [gachaResult, setGachaResult] = useState(null);
+  const [isSpinningGacha, setIsSpinningGacha] = useState(false);
+
+  // なつきレベル計算
+  const affectionLevel = Math.floor(affectionPoints / 100) + 1;
+  const nextAffectionThreshold = affectionLevel * 100;
+  const currentLevelProgress = affectionPoints % 100;
+
+  // --- 🎵 BGM再生用のWeb Audio API状態 🎵 ---
+  const [isBgmPlaying, setIsBgmPlaying] = useState(false);
+  const [bgmVolume, setBgmVolume] = useState(0.3); // デフォルト30%
+  const [bgmTrack, setBgmTrack] = useState('sunshine'); // 'sunshine' | 'night'
+  const audioCtxRef = useRef(null);
+  const nextNoteTimeRef = useRef(0);
+  const timerIdRef = useRef(null);
+  const melodyIndexRef = useRef(0);
+  const chordIndexRef = useRef(0);
+
+  // ローカルおまかせにゃんこプラン（APIキーがない場合のフォールバック）
+  const offlineCatPlans = [
+    {
+      title: "おひさまを浴びながらゴロゴロ散歩",
+      description: "お金を1円も使わずに、近所の公園の陽だまりを見つけて深呼吸するにゃ。まるで猫になった気分で15分ほど日向ぼっこしてリフレッシュするにゃ！",
+      duration: "30分",
+      budget: 0,
+      category: "アウトドア"
+    },
+    {
+      title: "ホットミルクを飲みながら読書タイム",
+      description: "おうちにあるお気に入りの本や漫画を引っ張り出すにゃ。温かいホットミルク（またはココア）をコップ1杯淹れて、ぬくぬく読書にふけるにゃ。",
+      duration: "1時間",
+      budget: 200,
+      category: "インドア"
+    },
+    {
+      title: "にゃんこ動画鑑賞とストレッチ",
+      description: "YouTubeで世界中の可愛い動物動画を見て癒やされるにゃ。画面を見ながら、猫のようにぐぐーっと背中を伸ばすストレッチをするのがおすすめにゃ🐾",
+      duration: "30分",
+      budget: 0,
+      category: "インドア"
+    },
+    {
+      title: "ちょっといいコンビニおやつを買う",
+      description: "お財布の予算が許すなら、帰りにコンビニでちょっと高級なロールケーキや和菓子を1つ買うにゃ。お気に入りの紅茶と合わせて至高のおやつタイムにするにゃ。",
+      duration: "30分",
+      budget: 350,
+      category: "インドア"
+    },
+    {
+      title: "近所のレトロな路地裏を探検",
+      description: "普段通らないような細い道や、猫が歩いていそうな裏路地をあえて歩いてみるにゃ。新しい発見や、隠れたおしゃれなお店が見つかるかもしれないにゃ！",
+      duration: "1時間",
+      budget: 0,
+      category: "アウトドア"
+    }
+  ];
+
+  // 初期ロード
+  useEffect(() => {
+    const savedDiaries = localStorage.getItem('wallet_ai_diaries');
+    const savedPlans = localStorage.getItem('wallet_ai_plans');
+    const savedApiKey = localStorage.getItem('wallet_ai_gemini_key');
+    const savedBalance = localStorage.getItem('wallet_balance');
+    const savedMonthlyBudget = localStorage.getItem('wallet_monthly_budget');
+    const savedTransactions = localStorage.getItem('wallet_transactions');
+    const savedDaily = localStorage.getItem('wallet_daily_suggestion');
+
+    // 育成・お部屋系の状態復元
+    const savedCoins = localStorage.getItem('wallet_matatabi_coins');
+    const savedAffection = localStorage.getItem('wallet_affection_points');
+    const savedPurchased = localStorage.getItem('wallet_purchased_items');
+    const savedEquipped = localStorage.getItem('wallet_equipped_items');
+
+    if (savedApiKey) setApiKey(savedApiKey);
+    if (savedBalance) setBalance(Number(savedBalance));
+    if (savedMonthlyBudget) setMonthlyBudget(Number(savedMonthlyBudget));
+
+    if (savedCoins) setMatatabiCoins(Number(savedCoins));
+    if (savedAffection) setAffectionPoints(Number(savedAffection));
+    if (savedPurchased) setPurchasedItems(JSON.parse(savedPurchased));
+    if (savedEquipped) setEquippedItems(JSON.parse(savedEquipped));
+    
+    // 日記
+    if (savedDiaries) {
+      setDiaries(JSON.parse(savedDiaries));
+    } else {
+      const defaultDiaries = [
+        {
+          id: '1',
+          date: '2026-05-20',
+          text: '仕事終わりにのんびりした。お気に入りの本を読んで心が落ち着いた。おやつに美味しいシュークリームを食べられて幸せだったにゃ。',
+          mood: 'normal',
+          analysis: {
+            summary: 'のんびり穏やかなご機嫌1日',
+            energy: '普通',
+            advice: 'ごゆるりとした良い1日だにゃ。お金をかけずに心を潤す読書は素晴らしい選択にゃ！明日も心地よいペースで過ごしてにゃ🐾'
+          }
+        }
+      ];
+      setDiaries(defaultDiaries);
+      localStorage.setItem('wallet_ai_diaries', JSON.stringify(defaultDiaries));
+    }
+
+    // 収支
+    if (savedTransactions) {
+      setTransactions(JSON.parse(savedTransactions));
+    } else {
+      const defaultTransactions = [
+        { id: 't1', date: '2026-05-18', type: 'income', amount: 150000, category: 'salary', description: '今月のお小遣い/給与にゃ' },
+        { id: 't2', date: '2026-05-19', type: 'expense', amount: 1200, category: 'food', description: '美味しいランチセット' },
+        { id: 't3', date: '2026-05-20', type: 'expense', amount: 350, category: 'entertainment', description: 'コンビニおやつ代' }
+      ];
+      setTransactions(defaultTransactions);
+      localStorage.setItem('wallet_transactions', JSON.stringify(defaultTransactions));
+    }
+
+    // 予定
+    if (savedPlans) {
+      setPlans(JSON.parse(savedPlans));
+    } else {
+      const defaultPlans = [
+        {
+          id: 'p1',
+          date: '2026-05-21',
+          title: 'おふとんで猫のように15分お昼寝',
+          description: 'アラームを優しめの音にセットして、ぬくぬくのお布団にくるまるにゃ。何もしない贅沢を味わうにゃ。もちろん無料にゃ🐾',
+          duration: '15分',
+          budget: 0,
+          category: 'インドア',
+          status: 'pending'
+        }
+      ];
+      setPlans(defaultPlans);
+      localStorage.setItem('wallet_ai_plans', JSON.stringify(defaultPlans));
+    }
+
+    // デイリーにゃんこ提案
+    if (savedDaily) {
+      setDailySuggestion(JSON.parse(savedDaily));
+    } else {
+      const initialPlan = offlineCatPlans[0];
+      setDailySuggestion(initialPlan);
+      localStorage.setItem('wallet_daily_suggestion', JSON.stringify(initialPlan));
+    }
+
+    setActiveCat(catNames[Math.floor(Math.random() * catNames.length)]);
+
+    return () => {
+      stopBgm();
+    };
+  }, []);
+
+  // コインとなつき度の永続化セーバー
+  const updateMatatabiEconomy = (newCoins, newAffection) => {
+    setMatatabiCoins(newCoins);
+    setAffectionPoints(newAffection);
+    localStorage.setItem('wallet_matatabi_coins', newCoins);
+    localStorage.setItem('wallet_affection_points', newAffection);
+  };
+
+  // 1音を鳴らす関数
+  const playNote = (freq, startTime, duration, volume, isChord = false) => {
+    if (!audioCtxRef.current) return;
+    const ctx = audioCtxRef.current;
+
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
+    osc.type = isChord ? 'sine' : 'triangle';
+    osc.frequency.setValueAtTime(freq, startTime);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(isChord ? 400 : 800, startTime);
+
+    gainNode.gain.setValueAtTime(0, startTime);
+    gainNode.gain.linearRampToValueAtTime(volume, startTime + 0.05);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+    osc.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    osc.start(startTime);
+    osc.stop(startTime + duration);
+  };
+
+  const playBgmScheduler = () => {
+    const ctx = audioCtxRef.current;
+    if (!ctx) return;
+
+    const scheduleAheadTime = 0.2;
+    const tempo = bgmTrack === 'sunshine' ? 100 : 80;
+    const secondsPerBeat = 60.0 / tempo;
+
+    while (nextNoteTimeRef.current < ctx.currentTime + scheduleAheadTime) {
+      const activeMelody = melodies[bgmTrack];
+      const activeChord = chords[bgmTrack];
+
+      const melodyFreq = activeMelody[melodyIndexRef.current];
+      playNote(melodyFreq, nextNoteTimeRef.current, secondsPerBeat * 0.9, bgmVolume * 0.25, false);
+
+      if (melodyIndexRef.current % 4 === 0) {
+        const chordArr = activeChord[chordIndexRef.current];
+        chordArr.forEach((baseFreq) => {
+          const stagger = Math.random() * 0.05;
+          playNote(baseFreq, nextNoteTimeRef.current + stagger, secondsPerBeat * 3.5, bgmVolume * 0.12, true);
+        });
+        
+        chordIndexRef.current = (chordIndexRef.current + 1) % activeChord.length;
+      }
+
+      nextNoteTimeRef.current += secondsPerBeat;
+      melodyIndexRef.current = (melodyIndexRef.current + 1) % activeMelody.length;
+    }
+
+    timerIdRef.current = setTimeout(playBgmScheduler, 50);
+  };
+
+  const startBgm = () => {
+    try {
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtxRef.current.state === 'suspended') {
+        audioCtxRef.current.resume();
+      }
+      nextNoteTimeRef.current = audioCtxRef.current.currentTime;
+      setIsBgmPlaying(true);
+      playBgmScheduler();
+    } catch (e) {
+      console.error("Audio Context Init Error: ", e);
+      setErrorMsg("お耳の蓄音機(BGM)の再生準備がうまくできなかったにゃん。");
+    }
+  };
+
+  const stopBgm = () => {
+    if (timerIdRef.current) {
+      clearTimeout(timerIdRef.current);
+    }
+    setIsBgmPlaying(false);
+  };
+
+  const handleToggleBgm = () => {
+    if (isBgmPlaying) stopBgm();
+    else startBgm();
+  };
+
+  const handleVolumeChange = (e) => {
+    setBgmVolume(parseFloat(e.target.value));
+  };
+
+  const handleTrackChange = (trackName) => {
+    setBgmTrack(trackName);
+    melodyIndexRef.current = 0;
+    chordIndexRef.current = 0;
+    if (audioCtxRef.current) {
+      nextNoteTimeRef.current = audioCtxRef.current.currentTime;
+    }
+  };
+
+  // --- 🔮 にゃんこガチャおみくじ機能 🔮 ---
+  const handleRollGacha = () => {
+    if (matatabiCoins < 10) {
+      alert("またたびコインが足りないにゃ！日記をかいたり予定をクリアして貯めるにゃ🐾");
+      return;
+    }
+
+    setIsSpinningGacha(true);
+    setGachaResult(null);
+
+    setTimeout(() => {
+      const fortunes = [
+        { title: "大吉にゃ！🌟", desc: "お空から大盛りのマグロ缶が降ってくるレベルの超ハッピーな一日になるにゃ！自信を持って進むにゃ。", rewardCoins: 50, rewardAffection: 30, text: "みけちゃんが大喜びですりすりしてくれたにゃ！" },
+        { title: "中吉にゃ🐾", desc: "お気に入りのひなたぼっこスポットが空いているくらいの、ちょうどいい幸運に恵まれる日だにゃ。", rewardCoins: 30, rewardAffection: 15, text: "みけちゃんがゴロゴロ喉を鳴らしているにゃ。" },
+        { title: "吉にゃん😸", desc: "落とした鉛筆が猫じゃらし de 遊びになって楽しいにゃ。ささやかな幸せを大切にするにゃ。", rewardCoins: 20, rewardAffection: 10, text: "みけちゃんがしっぽをパタパタ振っているにゃ。" },
+        { title: "小吉にゃ🍙", desc: "おふとんがいつもより少しふかふかに感じる日。のんびり、あせらず過ごせば吉にゃ！", rewardCoins: 15, rewardAffection: 8, text: "みけちゃんがマイペースにのびをしているにゃ。" }
+      ];
+
+      const picked = fortunes[Math.floor(Math.random() * fortunes.length)];
+      setGachaResult(picked);
+
+      const nextCoins = matatabiCoins - 10 + picked.rewardCoins;
+      const nextAffection = affectionPoints + picked.rewardAffection;
+      updateMatatabiEconomy(nextCoins, nextAffection);
+
+      setIsSpinningGacha(false);
+    }, 1200);
+  };
+
+  // --- 🛍️ ショップアイテムの購入＆着せ替え機能 🛍️ ---
+  const shopItems = [
+    { key: "red_ribbon", name: "赤い首輪リボン 🎀", cost: 50, desc: "首元をオシャレに彩るキュートな真っ赤なリボンにゃ。" },
+    { key: "glasses", name: "かっこいいメガネ 👓", cost: 100, desc: "これをかけると知的なお勉強キャットに変身できるにゃ." },
+    { key: "strawberry_hat", name: "いちごの帽子 🍓", cost: 150, desc: "みけちゃんのあたまにスッポリ乗る美味しいイチゴ型キャップにゃ。" }
+  ];
+
+  const handleBuyItem = (item) => {
+    if (purchasedItems[item.key]) return;
+    if (matatabiCoins < item.cost) {
+      alert("コインが足りないにゃ！おみくじや日記きろくで貯めてにゃ。");
+      return;
+    }
+
+    const nextCoins = matatabiCoins - item.cost;
+    const nextPurchased = { ...purchasedItems, [item.key]: true };
+    
+    setPurchasedItems(nextPurchased);
+    updateMatatabiEconomy(nextCoins, affectionPoints + 10); 
+    localStorage.setItem('wallet_purchased_items', JSON.stringify(nextPurchased));
+    alert(`🛒「${item.name}」をお買い上げだにゃ！さっそくお部屋で着せ替えてみてにゃ。`);
+  };
+
+  const handleToggleEquip = (key) => {
+    const nextEquipped = { ...equippedItems, [key]: !equippedItems[key] };
+    setEquippedItems(nextEquipped);
+    localStorage.setItem('wallet_equipped_items', JSON.stringify(nextEquipped));
+  };
+
+  // Gemini APIへの共通送信メソッド
+  const callGeminiAPI = async (payload, retryCount = 0) => {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+    
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error(`API error ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      if (retryCount < 5) {
+        const delay = Math.pow(2, retryCount) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        return callGeminiAPI(payload, retryCount + 1);
+      } else {
+        throw error;
+      }
+    }
+  };
+
+  // 🐾 お魚資金（収支履歴）の追加 🐾
+  const handleAddTransaction = (e) => {
+    e.preventDefault();
+    if (!txAmount || isNaN(txAmount) || Number(txAmount) <= 0) return;
+
+    const amountNum = Number(txAmount);
+    const newTx = {
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      type: txType,
+      amount: amountNum,
+      category: txCategory,
+      description: txDesc || (txType === 'income' ? 'ハッピー収入にゃ' : 'お買い物にゃ')
+    };
+
+    const updatedTxs = [newTx, ...transactions];
+    setTransactions(updatedTxs);
+    localStorage.setItem('wallet_transactions', JSON.stringify(updatedTxs));
+
+    const newBalance = txType === 'income' ? balance + amountNum : balance - amountNum;
+    setBalance(newBalance);
+    localStorage.setItem('wallet_balance', newBalance);
+
+    // 収支の記録でもご褒美コイン＆なつき度プレゼント！
+    updateMatatabiEconomy(matatabiCoins + 5, affectionPoints + 5);
+
+    setTxAmount('');
+    setTxDesc('');
+  };
+
+  // 🐾 収支履歴の削除 🐾
+  const handleDeleteTransaction = (id, type, amount) => {
+    if (confirm('この収支きろくを消しちゃうにゃ？ 持ち金も自動で戻るにゃ。')) {
+      const updated = transactions.filter(t => t.id !== id);
+      setTransactions(updated);
+      localStorage.setItem('wallet_transactions', JSON.stringify(updated));
+
+      const newBalance = type === 'income' ? balance - amount : balance + amount;
+      setBalance(newBalance);
+      localStorage.setItem('wallet_balance', newBalance);
+    }
+  };
+
+  // 日記の追加とAIにゃんこ分析
+  const handleAddDiary = async (e) => {
+    e.preventDefault();
+    if (!newDiaryText.trim()) return;
+
+    setIsAnalyzing(true);
+    setErrorMsg('');
+
+    let analysisResult = {
+      summary: 'のんびりご機嫌にゃんこ',
+      energy: '普通',
+      advice: 'お財布に無理にゃく、まったり自分を甘やかす時間を作ってにゃ🐾'
+    };
+
+    if (apiKey) {
+      const systemPrompt = `あなたは可愛くて少しお茶目な「にゃんこライフコーチ」です。
+ユーザーの日記を分析し、猫っぽく語尾に「〜にゃ」「〜にゃん🐾」をつけて、心があったまるアドバイスを以下のJSONフォーマットでのみ応答してください。
+JSONスキーマ:
+{
+  "summary": "今日の一言まとめ（15字程度、語尾にゃ）",
+  "energy": "エネルギーレベル（『アクティブにゃ！』『のんびりにゃ』『お疲れにゃ…』などから1つ）",
+  "advice": "お財布や気分に配慮した, 猫視点の心和む可愛いアドバイス（100字程度、語尾に〜にゃ！）"
+}`;
+
+      const userQuery = `
+気分: ${selectedMood}
+日記内容: ${newDiaryText}
+現在のお財布残高: ${balance}円
+今月の残りお小遣い: ${walletStats.remainingBudget}円`;
+
+      try {
+        const payload = {
+          contents: [{ parts: [{ text: userQuery }] }],
+          systemInstruction: { parts: [{ text: systemPrompt }] },
+          generationConfig: {
+            responseMimeType: "application/json",
+            responseSchema: {
+              type: "OBJECT",
+              properties: {
+                summary: { type: "STRING" },
+                energy: { type: "STRING" },
+                advice: { type: "STRING" }
+              },
+              required: ["summary", "energy", "advice"]
+            }
+          }
+        };
+
+        const result = await callGeminiAPI(payload);
+        const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (text) {
+          analysisResult = JSON.parse(text);
+        }
+      } catch (err) {
+        console.error("Diary Analysis Error:", err);
+        setErrorMsg('AIにゃんこが考えをまとめ損ねたみたいにゃ。でも日記はちゃんと保存したにゃ！');
+      }
+    }
+
+    const newDiary = {
+      id: Date.now().toString(),
+      date: new Date().toISOString().split('T')[0],
+      text: newDiaryText,
+      mood: selectedMood,
+      analysis: analysisResult
+    };
+
+    const updatedDiaries = [newDiary, ...diaries];
+    setDiaries(updatedDiaries);
+    localStorage.setItem('wallet_ai_diaries', JSON.stringify(updatedDiaries));
+
+    // 継続ご褒美
+    const nextCoins = matatabiCoins + 20; 
+    const nextAffection = affectionPoints + 15; 
+    updateMatatabiEconomy(nextCoins, nextAffection);
+
+    setNewDiaryText('');
+    setSelectedMood('normal');
+    setIsAnalyzing(false);
+  };
+
+  // デイリーにゃんこ提案
+  const handleGenerateDailySuggestion = async () => {
+    setIsGeneratingDaily(true);
+    setErrorMsg('');
+
+    if (!apiKey) {
+      const randomPlan = offlineCatPlans[Math.floor(Math.random() * offlineCatPlans.length)];
+      setDailySuggestion(randomPlan);
+      localStorage.setItem('wallet_daily_suggestion', JSON.stringify(randomPlan));
+      setIsGeneratingDaily(false);
+      return;
+    }
+
+    const systemPrompt = `あなたはユーザーに「毎日1個、最高の過ごし方」を届ける猫アシスタントです。
+現在のお財布残高や残りお小遣いを確認し、絶対に無理なく楽しめるおすすめプランを1個だけ厳選してください。
+語尾は必ず「にゃ」「にゃん🐾」など猫っぽく愛らしい表現にしてください。
+必ず提示されたJSONスキーマに厳密に沿って、JSON形式でのみ出力してください。他の説明やマークダウンは絶対に含めないでください。
+
+JSONスキーマ:
+{
+  "title": "過ごし方のタイトル（例: 『ぬくぬく猫足ゆったり足湯』）",
+  "description": "具体的な内容。どうやったらこの予算で一番幸せになれるかの猫からのアドバイス（100字程度）",
+  "duration": "かかる時間目安（例:『20分』）",
+  "budget": 予想される費用を「数値のみの円単位」で設定してください（例: 0、または 300 など。必ず半角 of 整数にすること）",
+  "category": "『インドア』または『アウトドア』"
+}`;
+
+    const userQuery = `
+【ユーザーのお財布事情】
+- 手元の持ち金: ${balance}円
+- 今月の残り自由に使える予算: ${walletStats.remainingBudget}円
+【最近の日記】
+${diaries.length > 0 ? diaries[0].text : 'まだ日記はありません。'}
+
+上記の情報にぴったりで、今すぐできる100点満点の過ごし方を「1つ」だけ提案してにゃ！`;
+
+    try {
+      const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              title: { type: "STRING" },
+              description: { type: "STRING" },
+              duration: { type: "STRING" },
+              budget: { type: "INTEGER" },
+              category: { type: "STRING" }
+            },
+            required: ["title", "description", "duration", "budget", "category"]
+          }
+        }
+      };
+
+      const result = await callGeminiAPI(payload);
+      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        const parsed = JSON.parse(text);
+        setDailySuggestion(parsed);
+        localStorage.setItem('wallet_daily_suggestion', JSON.stringify(parsed));
+      }
+    } catch (err) {
+      console.error("Daily Generator Error:", err);
+      const randomPlan = offlineCatPlans[Math.floor(Math.random() * offlineCatPlans.length)];
+      setDailySuggestion(randomPlan);
+    } finally {
+      setIsGeneratingDaily(false);
+    }
+  };
+
+  // 複数提案
+  const handleGenerateSuggestions = async () => {
+    setIsGenerating(true);
+    setErrorMsg('');
+    setGeneratedSuggestions([]);
+
+    if (!apiKey) {
+      setErrorMsg('お財布連動にゃんこ提案をたくさん生成するには、画面右上の設定から「Gemini APIキー」を登録してにゃ！🐾');
+      setIsGenerating(false);
+      return;
+    }
+
+    const durationLabels = { '30m': '30分', '1h': '1時間', '3h': '3時間', 'day': '丸一日' };
+    const categoryLabels = { 'indoor': 'インドア（おうち）', 'outdoor': 'アウトドア（お外）', 'any': 'どっちでも可にゃ' };
+    const moodLabels = { 'happy': 'ご機嫌・元気いっぱい', 'normal': 'まったり・いつも通り', 'tired': 'くたくた・癒やされたい' };
+
+    const systemPrompt = `あなたはユーザーの「お財布」と「気分」に寄り添う, ちょっぴりおせっかいな優秀にゃんこコンシェルジュです。
+提示された予算や条件をベースにして、生活がキラキラ楽しくなる現実的なお出かけ・おうちでの予定を必ず3つ作成してください。
+語尾は愛嬌たっぷりに「にゃ」「にゃん🐾」などを用いてください。
+必ず提示されたJSONスキーマに厳密に沿って、JSON形式でのみ出力してください。他の説明やマークダウンは絶対に含めないでください。
+
+JSONスキーマ:
+{
+  "suggestions": [
+    {
+      "title": "提案タイトル",
+      "description": "具体的なアクション内容。どうやったらこの予算で一番楽しめるかのコツ（100字程度）",
+      "duration": "かかる時間目安",
+      "budget": 予想される費用を「数値のみの円単位」で設定してください（必ず半角の整数にすること）",
+      "category": "『インドア』または『アウトドア』"
+    }
+  ]
+}`;
+
+    const userQuery = `
+- 自由に使える残り予算: ${walletStats.remainingBudget}円
+- 手元の総持ち金: ${balance}
+- 希望時間: ${durationLabels[duration]}
+- 場所: ${categoryLabels[category]}
+- 今の気分: ${moodLabels[customMood]}
+- 追加のリクエスト: ${additionalRequest || "なし"}`;
+
+    try {
+      const payload = {
+        contents: [{ parts: [{ text: userQuery }] }],
+        systemInstruction: { parts: [{ text: systemPrompt }] },
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: "OBJECT",
+            properties: {
+              suggestions: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    title: { type: "STRING" },
+                    description: { type: "STRING" },
+                    duration: { type: "STRING" },
+                    budget: { type: "INTEGER" },
+                    category: { type: "STRING" }
+                  },
+                  required: ["title", "description", "duration", "budget", "category"]
+                }
+              }
+            },
+            required: ["suggestions"]
+          }
+        }
+      };
+
+      const result = await callGeminiAPI(payload);
+      const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (text) {
+        const parsed = JSON.parse(text);
+        setGeneratedSuggestions(parsed.suggestions || []);
+      }
+    } catch (err) {
+      console.error("Generator Error:", err);
+      setErrorMsg('提案の作成がちょっとうまくいかなかったにゃ。APIキーなどを確認してほしいにゃん。');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  // プラン登録
+  const handleAddPlan = (suggestion) => {
+    const newPlan = {
+      id: Date.now().toString() + Math.random().toString(36).substr(2, 5),
+      date: new Date().toISOString().split('T')[0],
+      title: suggestion.title,
+      description: suggestion.description,
+      duration: suggestion.duration,
+      budget: Number(suggestion.budget) || 0,
+      category: suggestion.category,
+      status: 'pending'
+    };
+
+    const updatedPlans = [newPlan, ...plans];
+    setPlans(updatedPlans);
+    localStorage.setItem('wallet_ai_plans', JSON.stringify(updatedPlans));
+    
+    alert(`🐾「${suggestion.title}」をマイプランに登録したにゃん！`);
+  };
+
+  // 予定ステータス ＆ 自動支出
+  const togglePlanStatus = (id) => {
+    let budgetToSubtractOrAdd = 0;
+    let planTitle = '';
+    let willComplete = false;
+
+    const updated = plans.map(p => {
+      if (p.id === id) {
+        willComplete = p.status === 'pending';
+        budgetToSubtractOrAdd = p.budget || 0;
+        planTitle = p.title;
+        return { ...p, status: willComplete ? 'completed' : 'pending' };
+      }
+      return p;
+    });
+
+    setPlans(updated);
+    localStorage.setItem('wallet_ai_plans', JSON.stringify(updated));
+
+    if (willComplete && budgetToSubtractOrAdd > 0) {
+      const newTx = {
+        id: 'plan-sync-' + Date.now().toString(),
+        date: new Date().toISOString().split('T')[0],
+        type: 'expense',
+        amount: budgetToSubtractOrAdd,
+        category: 'entertainment',
+        description: `達成🐾 ${planTitle}`
+      };
+
+      const updatedTxs = [newTx, ...transactions];
+      setTransactions(updatedTxs);
+      localStorage.setItem('wallet_transactions', JSON.stringify(updatedTxs));
+
+      const newBalance = balance - budgetToSubtractOrAdd;
+      setBalance(newBalance);
+      localStorage.setItem('wallet_balance', newBalance);
+
+      // お小遣いミッションクリアボーナス
+      updateMatatabiEconomy(matatabiCoins + 15, affectionPoints + 15);
+
+      alert(`🎉おめでとうにゃ！\n「${planTitle}」の予算 ${budgetToSubtractOrAdd}円 をお財布の支出に自動で引いておいたにゃん。`);
+    }
+  };
+
+  // 予定削除
+  const handleDeletePlan = (id) => {
+    if (confirm('この予定を消しちゃうにゃ？')) {
+      const updated = plans.filter(p => p.id !== id);
+      setPlans(updated);
+      localStorage.setItem('wallet_ai_plans', JSON.stringify(updated));
+    }
+  };
+
+  // 日記削除
+  const handleDeleteDiary = (id) => {
+    if (confirm('この日記きろくを消しちゃうにゃ？')) {
+      const updated = diaries.filter(d => d.id !== id);
+      setDiaries(updated);
+      localStorage.setItem('wallet_ai_diaries', JSON.stringify(updated));
+    }
+  };
+
+  // 🐾 統計用の計算関数 🐾
+  const getStats = () => {
+    const totalDiaries = diaries.length;
+    const moodCounts = diaries.reduce((acc, curr) => {
+      acc[curr.mood] = (acc[curr.mood] || 0) + 1;
+      return acc;
+    }, { happy: 0, normal: 0, tired: 0, sad: 0 });
+
+    const totalPlans = plans.length;
+    const completedPlans = plans.filter(p => p.status === 'completed').length;
+
+    const categoryExpenses = transactions
+      .filter(t => t.type === 'expense')
+      .reduce((acc, curr) => {
+        const cat = curr.category || 'other';
+        acc[cat] = (acc[cat] || 0) + curr.amount;
+        return acc;
+      }, { food: 0, shopping: 0, entertainment: 0, other: 0 });
+
+    return {
+      totalDiaries,
+      moodCounts,
+      totalPlans,
+      completedPlans,
+      achievementRate: totalPlans > 0 ? Math.round((completedPlans / totalPlans) * 100) : 0,
+      categoryExpenses
+    };
+  };
+
+  const stats = getStats();
+
+  // 🐾 カレンダー描画ロジック 🐾
+  const getDaysInMonth = (year, month) => {
+    return new Date(year, month + 1, 0).getDate();
+  };
+
+  const getFirstDayOfMonth = (year, month) => {
+    return new Date(year, month, 1).getDay();
+  };
+
+  const handlePrevMonth = () => {
+    setCurrentCalDate(new Date(currentCalDate.getFullYear(), currentCalDate.getMonth() - 1, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentCalDate(new Date(currentCalDate.getFullYear(), currentCalDate.getMonth() + 1, 1));
+  };
+
+  const renderCalendar = () => {
+    const year = currentCalDate.getFullYear();
+    const month = currentCalDate.getMonth();
+    const daysInMonth = getDaysInMonth(year, month);
+    const firstDay = getFirstDayOfMonth(year, month);
+
+    const days = [];
+
+    // 空白セル
+    for (let i = 0; i < firstDay; i++) {
+      days.push(<div key={`empty-${i}`} className="h-14 bg-slate-50/50 border border-orange-50/30 rounded-xl"></div>);
+    }
+
+    // 日付セル
+    for (let day = 1; day <= daysInMonth; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      
+      const diaryOfTheDay = diaries.find(d => d.date === dateStr);
+      const moodConfig = diaryOfTheDay ? getMoodConfig(diaryOfTheDay.mood) : null;
+
+      days.push(
+        <div 
+          key={day} 
+          className={`h-14 border border-orange-100 rounded-2xl p-1 flex flex-col justify-between items-center relative transition-all ${
+            diaryOfTheDay ? 'bg-orange-50/60 border-orange-300 font-bold shadow-xs' : 'bg-white hover:bg-orange-50/10'
+          }`}
+        >
+          <span className="text-[10px] text-slate-500 absolute top-0.5 left-1.5">{day}</span>
+          {diaryOfTheDay ? (
+            <div className="text-xl mt-3 animate-bounce" title={diaryOfTheDay.text}>
+              {moodConfig.emoji}
+            </div>
+          ) : (
+            <div className="w-1.5 h-1.5 bg-orange-100 rounded-full mt-6"></div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-7 gap-1.5">
+        {['日', '月', '火', '水', '木', '金', '土'].map((d, i) => (
+          <div key={i} className="text-center text-[11px] font-black text-orange-950/70 py-1">{d}</div>
+        ))}
+        {days}
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-orange-50/20 text-slate-800 flex flex-col font-sans pb-32">
+      
+      {/* ヘッダー */}
+      <header className="bg-white border-b-4 border-orange-100 sticky top-0 z-40 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="p-2.5 bg-orange-400 text-white rounded-2xl shadow-md flex items-center justify-center border-2 border-white">
+              <CatIcon className="w-8 h-8 text-white" />
+            </div>
+            <div>
+              <div className="flex items-center space-x-2">
+                <h1 className="text-2xl font-black tracking-tight text-orange-950">にゃんこ日和ノート</h1>
+                <span className="text-xs bg-orange-100 text-orange-700 font-extrabold px-2 py-0.5 rounded-full border border-orange-200">🐾 お部屋</span>
+              </div>
+              <p className="text-xs text-orange-800 font-bold mt-0.5">お財布＆ココロに優しい、猫のまったりお部屋ライフプランナーだにゃ🐾</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setShowConfig(!showConfig)}
+            className="flex items-center space-x-2 px-4 py-2 rounded-2xl border-2 border-orange-200 bg-orange-50/50 hover:bg-orange-100 text-orange-950 transition text-xs font-black shadow-xs"
+          >
+            <Settings className="w-4 h-4 text-orange-500" />
+            <span>設定にゃ</span>
+          </button>
+        </div>
+      </header>
+
+      {/* APIキー設定 */}
+      {showConfig && (
+        <div className="bg-amber-100/80 border-b-4 border-amber-200 py-4 px-4 transition-all">
+          <div className="max-w-4xl mx-auto flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex-1">
+              <h3 className="font-extrabold text-amber-950 text-sm flex items-center gap-1">
+                <AlertCircle className="w-4 h-4 text-orange-600" />
+                Gemini APIキーを登録するにゃ🐾
+              </h3>
+              <p className="text-xs text-amber-900 mt-1">
+                APIキーを設定すると、AIにゃんこが日記の感情分析やお財布提案を無限に行ってくれるようになるにゃ！
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <input 
+                type="password" 
+                placeholder="AIzaSy..." 
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="bg-white border-2 border-amber-300 rounded-2xl px-4 py-2 text-xs flex-1 md:w-64 focus:outline-none focus:border-orange-400"
+              />
+              <button 
+                onClick={() => saveApiKey(apiKey)}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-black text-xs px-5 py-2 rounded-2xl transition"
+              >
+                保存にゃ🐾
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* メインコンテンツ */}
+      <main className="flex-1 max-w-4xl w-full mx-auto px-4 py-6">
+        
+        {/* 🎨 お部屋の三毛猫イラスト ＆ 🪙 お財布ステータス ＆ ❤️ なつき度メーター */}
+        <div className="bg-white p-6 rounded-3xl border-4 border-orange-100 shadow-sm mb-6 flex flex-col md:flex-row gap-6 items-center">
+          <div className="shrink-0 flex flex-col items-center justify-center bg-orange-50/50 rounded-2xl border-2 border-orange-100 p-2 relative">
+            <CozyCatArt equipped={equippedItems} />
+            <span className="absolute bottom-2 bg-orange-500 text-white text-[10px] font-black px-2.5 py-0.5 rounded-full border border-white">
+              なつきLv.{affectionLevel}
+            </span>
+          </div>
+          
+          <div className="flex-1 space-y-3.5 w-full text-center md:text-left">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+              <div className="flex items-center justify-center md:justify-start space-x-2">
+                <span className="p-1.5 bg-orange-100 text-orange-700 rounded-xl">
+                  <Heart className="w-4 h-4 text-rose-500 animate-pulse" />
+                </span>
+                <h3 className="font-black text-orange-950 text-base">みけちゃんのお部屋</h3>
+              </div>
+              
+              {/* 🪙 またたびコイン表示 */}
+              <div className="flex items-center justify-center space-x-1 bg-amber-50 border-2 border-amber-200 px-3 py-1 rounded-full text-xs font-black text-amber-800">
+                <span>🪙 またたびコイン:</span>
+                <span className="text-sm text-amber-600">{matatabiCoins} 枚</span>
+              </div>
+            </div>
+
+            {/* なつき度のセリフ */}
+            <p className="text-sm text-slate-700 leading-relaxed font-semibold bg-orange-50/40 p-3 rounded-2xl border border-orange-100/50">
+              {getCatAffectionMessage()}
+            </p>
+
+            {/* なつき度進捗バー */}
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[11px] font-black text-slate-500">
+                <span>なつき度 Lv.{affectionLevel} ({affectionPoints} pt)</span>
+                <span>次のレベルまで: {nextAffectionThreshold - affectionPoints} pt</span>
+              </div>
+              <div className="w-full bg-slate-100 h-3.5 rounded-full border-2 border-orange-100 overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-rose-400 to-pink-500 h-full rounded-full transition-all duration-500"
+                  style={{ width: `${currentLevelProgress}%` }}
+                ></div>
+              </div>
+            </div>
+
+            {/* 📻 蓄音機(BGM)プレイヤー */}
+            <div className="bg-orange-50/80 border-2 border-orange-100 rounded-2xl p-3 flex flex-col md:flex-row items-center justify-between gap-3 shadow-inner">
+              <div className="flex items-center space-x-2">
+                <div className={`p-2 rounded-full ${isBgmPlaying ? 'bg-orange-400 text-white animate-spin' : 'bg-orange-100 text-orange-700'}`}>
+                  <Music className="w-4 h-4" />
+                </div>
+                <div className="text-left">
+                  <p className="text-xs font-black text-orange-950">みけちゃんの蓄音機 (BGM)</p>
+                  <p className="text-[10px] text-orange-700 font-bold">
+                    {isBgmPlaying ? `再生中: ${bgmTrack === 'sunshine' ? '☀️ 陽だまりのお昼寝' : '🌙 おやすみ肉球'}` : '蓄音機はとまっているにゃ'}
+                  </p>
+                </div>
+              </div>
+
+              {/* コントロール */}
+              <div className="flex items-center flex-wrap gap-2 justify-center">
+                {/* チャンネル切り替え */}
+                <div className="flex bg-white/70 border border-orange-150 rounded-lg p-0.5 text-[9px] font-black">
+                  <button 
+                    onClick={() => handleTrackChange('sunshine')}
+                    className={`px-2 py-1 rounded-md transition ${bgmTrack === 'sunshine' ? 'bg-orange-400 text-white' : 'text-orange-900 hover:bg-orange-100'}`}
+                  >
+                    ☀️ 陽だまり
+                  </button>
+                  <button 
+                    onClick={() => handleTrackChange('night')}
+                    className={`px-2 py-1 rounded-md transition ${bgmTrack === 'night' ? 'bg-orange-400 text-white' : 'text-orange-900 hover:bg-orange-100'}`}
+                  >
+                    🌙 おやすみ
+                  </button>
+                </div>
+
+                {/* 音量調整 */}
+                <div className="flex items-center space-x-1.5 px-2 bg-white/50 rounded-lg border border-orange-100 py-1">
+                  {bgmVolume === 0 ? <VolumeX className="w-3.5 h-3.5 text-orange-400" /> : <Volume2 className="w-3.5 h-3.5 text-orange-500" />}
+                  <input 
+                    type="range" 
+                    min="0" 
+                    max="1" 
+                    step="0.05" 
+                    value={bgmVolume} 
+                    onChange={handleVolumeChange}
+                    className="w-16 accent-orange-400 h-1 cursor-pointer"
+                  />
+                </div>
+
+                {/* 再生/停止 */}
+                <button 
+                  onClick={handleToggleBgm}
+                  className="bg-orange-400 hover:bg-orange-500 text-white p-2 rounded-xl transition border border-orange-300 shadow-sm flex items-center justify-center"
+                >
+                  {isBgmPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* お財布（お魚資金）ステータス */}
+        <div className="bg-gradient-to-r from-orange-400 via-amber-400 to-orange-400 text-white rounded-3xl p-5 mb-6 shadow-md flex flex-wrap gap-4 items-center justify-between relative overflow-hidden border-2 border-orange-200">
+          <div className="absolute right-4 bottom-0 opacity-15 pointer-events-none">
+            <PawIcon className="w-36 h-36 text-white" />
+          </div>
+          
+          <div className="flex items-center space-x-4 z-10">
+            <div className="p-3 bg-white/20 rounded-2xl border border-white/30">
+              <Wallet className="w-6 h-6 text-white" />
+            </div>
+            <div className="space-y-1">
+              <span className="text-xs text-orange-950 font-black tracking-wider flex items-center gap-1">
+                手元のまったりお小遣い 🐾
+              </span>
+              <p className="text-3xl font-black tracking-wide">¥{balance.toLocaleString()}</p>
+            </div>
+          </div>
+          
+          <div className="h-10 w-px bg-white/20 hidden md:block"></div>
+          
+          <div className="space-y-1 z-10">
+            <span className="text-xs text-orange-950 font-black tracking-wider">今月の残り予算（お小遣い枠）</span>
+            <p className={`text-xl font-black ${walletStats.remainingBudget < 3000 ? 'text-rose-600 bg-white/95 px-3 py-1 rounded-xl shadow-xs' : 'text-white'}`}>
+              ¥{walletStats.remainingBudget.toLocaleString()} / <span className="text-sm">お小遣い枠: ¥{monthlyBudget.toLocaleString()}</span>
+            </p>
+          </div>
+
+          <div className="w-full md:w-auto z-10">
+            <button 
+              onClick={() => setActiveTab('wallet')}
+              className="w-full text-center bg-white text-orange-950 hover:bg-orange-50 text-xs font-black py-3 px-5 rounded-2xl transition border-2 border-orange-100 shadow-sm"
+            >
+              お財布（お魚資金）をきろく🐾
+            </button>
+          </div>
+        </div>
+
+        {/* 1. 日記タブ */}
+        {activeTab === 'diary' && (
+          <div className="space-y-6">
+            
+            {/* デイリーにゃんこ提案 🐾 */}
+            <div className="bg-white p-6 rounded-3xl border-4 border-orange-100 shadow-xs relative overflow-hidden">
+              <div className="absolute top-0 right-0 p-4 text-orange-300 opacity-20">
+                <CatIcon className="w-28 h-28 text-orange-200" />
+              </div>
+
+              <div className="flex items-center justify-between mb-4 z-10 relative">
+                <div className="flex items-center space-x-2">
+                  <span className="p-1.5 bg-amber-100 text-amber-700 rounded-xl">
+                    <PawIcon className="w-4 h-4" />
+                  </span>
+                  <h3 className="font-black text-orange-950 text-base">
+                    きょうの「デイリーにゃんこ提案」🐈🐾
+                  </h3>
+                </div>
+                <button 
+                  onClick={handleGenerateDailySuggestion}
+                  disabled={isGeneratingDaily}
+                  className="text-xs font-black text-orange-700 hover:text-orange-800 bg-orange-50 border-2 border-orange-200 px-3 py-1.5 rounded-2xl transition flex items-center gap-1 shadow-xs"
+                >
+                  {isGeneratingDaily ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-3.5 h-3.5 text-orange-500" />
+                  )}
+                  <span>別のを提案してにゃ</span>
+                </button>
+              </div>
+
+              {dailySuggestion ? (
+                <div className="bg-orange-50/50 rounded-2xl p-5 border-2 border-orange-100 flex flex-col md:flex-row md:items-center justify-between gap-5">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex items-center flex-wrap gap-2">
+                      <span className="text-xs bg-orange-400 text-white font-extrabold px-3 py-1 rounded-full shadow-xs">
+                        本日のおすすめ🐾
+                      </span>
+                      <span className={`text-xs px-2.5 py-1 rounded-full font-black ${dailySuggestion.budget === 0 ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-orange-100 text-orange-800 border border-orange-200'}`}>
+                        {dailySuggestion.budget === 0 ? '完全0円にゃ！' : `¥${dailySuggestion.budget.toLocaleString()}`}
+                      </span>
+                      <span className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full font-black border border-slate-200">
+                        🕒 {dailySuggestion.duration}
+                      </span>
+                    </div>
+                    <h4 className="font-black text-slate-900 text-base leading-tight">{dailySuggestion.title}</h4>
+                    <p className="text-xs text-slate-600 leading-relaxed font-bold">{dailySuggestion.description}</p>
+                  </div>
+                  <div className="shrink-0 w-full md:w-auto">
+                    <button
+                      onClick={() => handleAddPlan(dailySuggestion)}
+                      className="w-full bg-orange-400 hover:bg-orange-500 text-white font-black text-sm py-3 px-5 rounded-2xl transition shadow-md flex items-center justify-center space-x-2 border-2 border-white"
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>きょうの予定に入れるにゃ🐾</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-6 text-xs text-slate-400">
+                  今日の過ごし方プランを取得中だにゃ🐾
+                </div>
+              )}
+            </div>
+
+            {/* 大きめもっちり日記作成フォーム 📝 */}
+            <div className="bg-white p-6 rounded-3xl border-4 border-orange-100 shadow-xs">
+              <div className="flex flex-col md:flex-row items-center gap-6 border-b-2 border-orange-50 pb-5 mb-4">
+                {/* ✍️🐈 日記を書くみけちゃんのアート */}
+                <div className="shrink-0 bg-orange-50/40 rounded-2xl p-1 border-2 border-orange-100/50">
+                  <WritingCatArt equipped={equippedItems} />
+                </div>
+                <div className="text-center md:text-left flex-1 space-y-1">
+                  <div className="flex items-center justify-center md:justify-start space-x-2">
+                    <BookOpen className="text-orange-400 w-6 h-6" />
+                    <h2 className="font-black text-orange-950 text-lg">きょうのきろく（猫日誌）をかくにゃ🐾</h2>
+                  </div>
+                  <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                    みけちゃんもノートをひろげて、きょうのきろくを書く準備ができたみたいにゃ！<br />
+                    日記を書くと【🪙コイン+20 / なつき度+15】が手に入るにゃ🐾
+                  </p>
+                </div>
+              </div>
+              
+              <form onSubmit={handleAddDiary} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-black text-slate-500 mb-2.5">今の気分をおおきくポチッとするにゃ：</label>
+                  <div className="grid grid-cols-4 gap-2.5">
+                    {[
+                      { key: 'happy', emoji: "😺", label: '元気ハッピー' },
+                      { key: 'normal', emoji: "😸", label: 'まったり通常' },
+                      { key: 'tired', emoji: "😿", label: 'くたくただらん' },
+                      { key: 'sad', emoji: "🥺", label: 'しょんぼり' }
+                    ].map((moodItem) => (
+                      <button
+                        key={moodItem.key}
+                        type="button"
+                        onClick={() => setSelectedMood(moodItem.key)}
+                        className={`flex flex-col items-center justify-center p-3.5 rounded-3xl border-2 transition ${
+                          selectedMood === moodItem.key ? getMoodConfig(moodItem.key).bg + ' ring-2 ring-orange-300/30 border-orange-300' : 'border-slate-200 hover:bg-slate-50 text-slate-600'
+                        }`}
+                      >
+                        <span className="text-2xl">{moodItem.emoji}</span>
+                        <span className="text-xs font-black mt-1.5">{moodItem.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <textarea
+                    rows="4"
+                    value={newDiaryText}
+                    onChange={(e) => setNewDiaryText(e.target.value)}
+                    placeholder="今日あったことや感じたことを、おおきな文字で自由に書いてにゃ🐾 どんな楽しいことがあった？"
+                    className="w-full border-2 border-orange-100 rounded-3xl p-4 focus:outline-none focus:ring-2 focus:ring-orange-400 placeholder-slate-400 text-sm font-semibold leading-relaxed shadow-inner"
+                  ></textarea>
+                </div>
+
+                <div className="flex justify-end">
+                  <button
+                    type="submit"
+                    disabled={isAnalyzing || !newDiaryText.trim()}
+                    className="bg-orange-400 hover:bg-orange-500 disabled:bg-slate-200 disabled:text-slate-400 text-white text-sm font-black py-3 px-6 rounded-2xl transition flex items-center space-x-2 shadow-sm border-2 border-white"
+                  >
+                    {isAnalyzing ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>AIにゃんこが解読中だにゃ🐾</span>
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        <span>きろくを保存 ＆ AI分析にゃ🐾</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* 日記の履歴 (リスト / カレンダー切り替え可能！) */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between px-1">
+                <h3 className="font-black text-orange-950 text-base flex items-center gap-1">🐾 最近の猫日誌履歴</h3>
+                
+                {/* 切り替えスイッチ */}
+                <div className="flex bg-white border-2 border-orange-100 rounded-2xl p-0.5 text-xs font-black">
+                  <button 
+                    onClick={() => setDiaryViewMode('list')}
+                    className={`px-3 py-1 rounded-xl transition ${diaryViewMode === 'list' ? 'bg-orange-400 text-white' : 'text-orange-900 hover:bg-orange-50'}`}
+                  >
+                    リスト
+                  </button>
+                  <button 
+                    onClick={() => setDiaryViewMode('calendar')}
+                    className={`px-3 py-1 rounded-xl transition ${diaryViewMode === 'calendar' ? 'bg-orange-400 text-white' : 'text-orange-900 hover:bg-orange-50'}`}
+                  >
+                    カレンダースタンプ📅
+                  </button>
+                </div>
+              </div>
+
+              {diaryViewMode === 'calendar' ? (
+                <div className="bg-white rounded-3xl p-5 border-4 border-orange-100 shadow-sm">
+                  <div className="flex items-center justify-between mb-4">
+                    <button onClick={handlePrevMonth} className="p-2 bg-orange-50 hover:bg-orange-100 rounded-xl font-bold text-orange-950 text-xs">◀ 先月</button>
+                    <h4 className="font-black text-orange-950 text-base">{currentCalDate.getFullYear()}年 {currentCalDate.getMonth() + 1}月</h4>
+                    <button onClick={handleNextMonth} className="p-2 bg-orange-50 hover:bg-orange-100 rounded-xl font-bold text-orange-950 text-xs">翌月 ▶</button>
+                  </div>
+                  {renderCalendar()}
+                  <p className="text-[10px] text-center text-slate-400 font-bold mt-3">日記を書ききろくした日には、ココロの猫スタンプがペタッと押されるにゃ🐾</p>
+                </div>
+              ) : diaries.length === 0 ? (
+                <div className="bg-white rounded-3xl p-10 text-center text-sm border-2 border-orange-100 text-slate-400">
+                  日記きろくはまだ無いにゃ。今日一日の思い出を書き残してほしいにゃん。
+                </div>
+              ) : (
+                diaries.map((diary) => {
+                  const mConfig = getMoodConfig(diary.mood);
+                  return (
+                    <div key={diary.id} className="bg-white rounded-3xl border-2 border-orange-100 overflow-hidden shadow-xs hover:shadow-sm transition">
+                      <div className="px-5 py-4 border-b-2 border-orange-50 flex items-center justify-between bg-orange-50/20">
+                        <div className="flex items-center space-x-2">
+                          <span className="text-sm font-black text-orange-900">{diary.date}</span>
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-black ${mConfig.labelColor}`}>
+                            <span className="mr-1">{mConfig.emoji}</span> {mConfig.text}
+                          </span>
+                        </div>
+                        <button 
+                          onClick={() => handleDeleteDiary(diary.id)}
+                          className="text-slate-300 hover:text-rose-500 p-1.5 rounded-lg hover:bg-slate-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                      <div className="p-5 space-y-4">
+                        <p className="text-slate-700 text-sm font-semibold leading-relaxed whitespace-pre-wrap">{diary.text}</p>
+                        {diary.analysis && (
+                          <div className={`p-4 rounded-2xl border-2 ${mConfig.bg} space-y-2`}>
+                            <div className="flex justify-between items-center text-xs font-black text-orange-950">
+                              <span className="flex items-center gap-1">
+                                <Sparkles className="w-4 h-4 text-orange-500" /> AI心お財布にゃんこノート
+                              </span>
+                              <span>活動レベル: {diary.analysis.energy}</span>
+                            </div>
+                            <p className="text-xs font-black text-slate-900 bg-white/60 px-2 py-1 rounded-lg inline-block">みけ要約: {diary.analysis.summary}</p>
+                            <p className="text-xs text-slate-700 leading-relaxed font-bold">{diary.analysis.advice}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 2. お財布・収支タブ */}
+        {activeTab === 'wallet' && (
+          <div className="space-y-6">
+            <div className="bg-white p-5 rounded-3xl border border-orange-100/70 shadow-xs">
+              <h2 className="font-black text-orange-950 text-base mb-4 flex items-center gap-1.5">
+                <Wallet className="w-4 h-4 text-orange-400" />
+                お魚資金（お財布残高）の調整にゃ🐾
+              </h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-black text-slate-500 mb-1">現在の総手持ち資金</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="number"
+                      value={balance}
+                      onChange={(e) => handleSaveWalletConfig(Number(e.target.value), monthlyBudget)}
+                      className="bg-orange-50/50 border border-orange-100 rounded-2xl p-2.5 text-xs font-black w-full focus:outline-none"
+                    />
+                    <span className="flex items-center text-xs font-black">円</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-black text-slate-500 mb-1">今月使ってもいい予定お小遣い</label>
+                  <div className="flex gap-2">
+                    <input 
+                      type="number"
+                      value={monthlyBudget}
+                      onChange={(e) => handleSaveWalletConfig(balance, Number(e.target.value))}
+                      className="bg-orange-50/50 border border-orange-100 rounded-2xl p-2.5 text-xs font-black w-full focus:outline-none"
+                    />
+                    <span className="flex items-center text-xs font-black">円</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* クイック家計簿 */}
+            <div className="bg-white p-5 rounded-3xl border border-orange-100/70 shadow-xs">
+              <h3 className="font-black text-orange-950 text-sm mb-4">お小遣いの変動をメモするにゃ🐾</h3>
+              <form onSubmit={handleAddTransaction} className="space-y-4">
+                <div className="flex gap-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setTxType('expense')}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-black border transition ${
+                      txType === 'expense' ? 'bg-orange-50 border-orange-300 text-orange-900' : 'bg-slate-50 border-slate-200 text-slate-600'
+                    }`}
+                  >
+                    支出（お買い物・おやつ代など）
+                  </button>
+                  <button 
+                    type="button" 
+                    onClick={() => setTxType('income')}
+                    className={`flex-1 py-2.5 rounded-xl text-xs font-black border transition ${
+                      txType === 'income' ? 'bg-emerald-50 border-emerald-300 text-emerald-900' : 'bg-slate-50 border-slate-200 text-slate-600'
+                    }`}
+                  >
+                    収入（給料やハッピー臨時ボーナス！）
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="block text-xs font-black text-slate-500 mb-1">金額 (円)</label>
+                    <input 
+                      type="number"
+                      required
+                      placeholder="例: 1500"
+                      value={txAmount}
+                      onChange={(e) => setTxAmount(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-slate-500 mb-1">ジャンル</label>
+                    <select
+                      value={txCategory}
+                      onChange={(e) => setTxCategory(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs font-black focus:outline-none"
+                    >
+                      <option value="entertainment">娯楽・暇つぶし</option>
+                      <option value="food">ごはん・猫缶・カフェ</option>
+                      <option value="shopping">猫じゃらし・雑貨購入</option>
+                      <option value="salary">お小遣い支給・お給料</option>
+                      <option value="other">その他にゃん</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-black text-slate-500 mb-1">メモ</label>
+                    <input 
+                      type="text"
+                      placeholder="例: キャットカフェ、ケーキ"
+                      value={txDesc}
+                      onChange={(e) => setTxDesc(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs focus:outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex justify-end">
+                  <button 
+                    type="submit"
+                    className="bg-orange-400 hover:bg-orange-500 text-white font-black text-xs py-2 px-6 rounded-2xl transition shadow-xs"
+                  >
+                    お小遣いに記録にゃ🐾
+                  </button>
+                </div>
+              </form>
+            </div>
+
+            {/* 収支履歴 */}
+            <div className="bg-white p-5 rounded-3xl border border-orange-100/70 shadow-xs">
+              <h3 className="font-black text-orange-950 text-sm mb-4">お魚資金の履歴</h3>
+              {transactions.length === 0 ? (
+                <div className="text-center py-6 text-xs text-slate-400">まだお金の変動は無いにゃ。</div>
+              ) : (
+                <div className="divide-y divide-orange-50">
+                  {transactions.map((tx) => (
+                    <div key={tx.id} className="py-3 flex items-center justify-between text-xs">
+                      <div className="flex items-center space-x-3">
+                        <div className={`p-2 rounded-xl ${tx.type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-orange-50 text-orange-600'}`}>
+                          {tx.type === 'income' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
+                        </div>
+                        <div>
+                          <p className="font-black text-slate-900">{tx.description}</p>
+                          <p className="text-[9px] text-slate-400">{tx.date} • {tx.category}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-3 font-bold">
+                        <span className={tx.type === 'income' ? 'text-emerald-600' : 'text-slate-800'}>
+                          {tx.type === 'income' ? '+' : '-'}¥{tx.amount.toLocaleString()}
+                        </span>
+                        <button 
+                          onClick={() => handleDeleteTransaction(tx.id, tx.type, tx.amount)}
+                          className="text-slate-300 hover:text-rose-500 p-1 rounded"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 3. プラン提案 ＆ ガチャタブ */}
+        {activeTab === 'plan' && (
+          <div className="space-y-6">
+            
+            {/* 🔮 きょうのにゃんこ運勢おみくじガチャ 🔮 */}
+            <div className="bg-gradient-to-br from-indigo-900 via-purple-950 to-indigo-950 p-6 rounded-3xl border-4 border-indigo-200/50 text-white relative overflow-hidden shadow-md">
+              <div className="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-6 -translate-y-6">
+                <Gift className="w-40 h-40" />
+              </div>
+
+              <div className="flex items-center space-x-2 mb-4">
+                <span className="p-1.5 bg-indigo-500 rounded-xl text-white">
+                  <Gift className="w-4 h-4" />
+                </span>
+                <h3 className="font-black text-sm">きょうのにゃんこ運勢おみくじ 🐾</h3>
+              </div>
+
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="text-center shrink-0">
+                  <div className="text-5xl mb-2 animate-bounce">🔮</div>
+                  <button 
+                    onClick={handleRollGacha}
+                    disabled={isSpinningGacha}
+                    className="bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 disabled:from-slate-600 disabled:to-slate-700 text-white font-black text-xs py-3 px-5 rounded-2xl shadow-md border-2 border-white transition flex items-center space-x-1 justify-center"
+                  >
+                    {isSpinningGacha ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>ガラガラガラ...🐾</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>ガチャを引くにゃ (🪙10)</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+
+                <div className="flex-1 space-y-2 border-t md:border-t-0 md:border-l border-white/20 pt-4 md:pt-0 md:pl-6 text-center md:text-left">
+                  {gachaResult ? (
+                    <div className="space-y-2 animate-fade-in">
+                      <p className="text-lg font-black text-amber-300">{gachaResult.title}</p>
+                      <p className="text-xs text-slate-200 font-bold leading-relaxed">{gachaResult.desc}</p>
+                      <div className="flex flex-wrap gap-2 justify-center md:justify-start pt-1 text-[10px] font-black">
+                        <span className="bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-md">
+                          🪙 コイン ＋{gachaResult.rewardCoins}枚 ゲット！
+                        </span>
+                        <span className="bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2 py-0.5 rounded-md">
+                          ❤️ なつき度 ＋{gachaResult.rewardAffection} pt！
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-300 font-bold italic">{gachaResult.text}</p>
+                    </div>
+                  ) : (
+                    <div className="py-2">
+                      <p className="text-xs font-black text-indigo-200">「みけちゃんのおみくじマシンにゃ！コイン10枚でその日の運勢がわかるお告げが聞けるにゃ🐾」</p>
+                      <p className="text-[10px] text-indigo-300 mt-1">※運が良いとたくさんのまたたびコインや、みけちゃんのなつき度が大幅アップにゃ！</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* 条件入力 */}
+            <div className="bg-white p-5 rounded-3xl border border-orange-100/70 shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Compass className="text-orange-400 w-5 h-5" />
+                  <h2 className="font-black text-orange-950 text-sm">にゃんこお財布AIに予定をねだる🐾</h2>
+                </div>
+                <div className="text-right">
+                  <span className="text-[9px] font-black text-slate-400 block">現在の残り予算</span>
+                  <span className="text-xs font-black text-orange-700">¥{walletStats.remainingBudget.toLocaleString()}</span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* 空き時間 */}
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 mb-1.5 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5" /> 確保できる時間
+                    </label>
+                    <select 
+                      value={duration} 
+                      onChange={(e) => setDuration(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs font-black focus:outline-none"
+                    >
+                      <option value="30m">ちょっとした毛づくろい（30分）</option>
+                      <option value="1h">ほどよくまったり（1時間）</option>
+                      <option value="3h">まとまったお昼寝（3時間）</option>
+                      <option value="day">とことんゴロゴロ（丸一日）</option>
+                    </select>
+                  </div>
+
+                  {/* ロケーション */}
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 mb-1.5 flex items-center gap-1">
+                      <MapPin className="w-3.5 h-3.5" /> 場所の希望にゃ
+                    </label>
+                    <select 
+                      value={category} 
+                      onChange={(e) => setCategory(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs font-black focus:outline-none"
+                    >
+                      <option value="any">おまかせにゃ</option>
+                      <option value="indoor">おうちでぬくぬく（インドア）</option>
+                      <option value="outdoor">お外で探検（アウトドア）</option>
+                    </select>
+                  </div>
+
+                  {/* 気分 */}
+                  <div>
+                    <label className="block text-[10px] font-black text-slate-500 mb-1.5 flex items-center gap-1">
+                      <Smile className="w-3.5 h-3.5" /> 今のコンディション
+                    </label>
+                    <select 
+                      value={customMood} 
+                      onChange={(e) => setCustomMood(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs font-black focus:outline-none"
+                    >
+                      <option value="happy">元気いっぱい！アクティブにゃ</option>
+                      <option value="normal">ほどよくまったり、通常運転</option>
+                      <option value="tired">もう疲れ果ててゴロゴロしたい</option>
+                    </select>
+                  </div>
+                </div>
+
+                {/* 自由なリクエスト */}
+                <div>
+                  <label className="block text-[10px] font-black text-slate-500 mb-1.5">追加のリクエスト（任意）</label>
+                  <input 
+                    type="text"
+                    value={additionalRequest}
+                    onChange={(e) => setAdditionalRequest(e.target.value)}
+                    placeholder="例: あまいものが食べたい、静かに過ごしたい等"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-2.5 text-xs focus:outline-none"
+                  />
+                </div>
+
+                <div className="pt-2">
+                  <button
+                    onClick={handleGenerateSuggestions}
+                    disabled={isGenerating}
+                    className="w-full bg-orange-400 hover:bg-orange-500 disabled:bg-slate-200 disabled:text-slate-400 text-white font-black py-3 px-6 rounded-2xl transition flex items-center justify-center space-x-2 shadow-sm"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>お財布と相談しながらアイデアを練り練り中にゃ...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span>お財布にやさしい予定を提案してもらうにゃ🐾</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* AIからの提案結果 */}
+            {generatedSuggestions.length > 0 && (
+              <div className="space-y-4">
+                <h3 className="font-black text-orange-950 text-sm flex items-center gap-1.5 px-1">
+                  <Sparkles className="w-4 h-4 text-orange-500" />
+                  AIにゃんこおすすめの予定
+                </h3>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {generatedSuggestions.map((suggestion, index) => (
+                    <div 
+                      key={index} 
+                      className="bg-white border border-orange-100 rounded-3xl p-5 shadow-xs flex flex-col justify-between hover:border-orange-300 transition relative"
+                    >
+                      <div className="space-y-3">
+                        <span className="inline-block text-[9px] bg-orange-50 text-orange-700 font-extrabold px-2.5 py-0.5 rounded-full">
+                          にゃんこプラン 0{index + 1}
+                        </span>
+                        <h4 className="font-black text-slate-900 text-sm leading-snug">{suggestion.title}</h4>
+                        <p className="text-xs text-slate-600 leading-relaxed font-bold">{suggestion.description}</p>
+                        
+                        <div className="pt-2 flex flex-wrap gap-1.5 text-[9px] font-black">
+                          <span className="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-md flex items-center gap-0.5">
+                            🕒 {suggestion.duration}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-md flex items-center gap-0.5 ${suggestion.budget === 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-orange-100 text-orange-800'}`}>
+                            💰 {suggestion.budget === 0 ? '0円にゃ！' : `¥${suggestion.budget.toLocaleString()}`}
+                          </span>
+                          <span className="bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded-md">
+                            📍 {suggestion.category}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => handleAddPlan(suggestion)}
+                        className="mt-5 w-full bg-orange-400 hover:bg-orange-500 text-white font-black text-xs py-2.5 px-3 rounded-xl transition flex items-center justify-center space-x-1"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        <span>これにするにゃ！</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* 4. マイスケジュール・猫予定 */}
+        {activeTab === 'history' && (
+          <div className="space-y-6">
+            <div className="bg-white p-5 rounded-3xl border border-orange-100/70 shadow-xs">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center space-x-2">
+                  <Calendar className="text-orange-400 w-5 h-5" />
+                  <h2 className="font-black text-orange-950 text-sm">まったり予定リストにゃ🐾</h2>
+                </div>
+                <span className="text-xs font-black text-orange-800 bg-orange-50 px-2.5 py-1 rounded-full">
+                  達成率: {stats.achievementRate}% ({stats.completedPlans}/{stats.totalPlans})
+                </span>
+              </div>
+
+              <div className="mb-4 p-3 bg-orange-50/50 border border-orange-100 rounded-2xl text-[11px] text-orange-950 leading-relaxed font-bold">
+                <p className="font-black flex items-center gap-1">
+                  💡 猫からのお知らせ
+                </p>
+                <p className="text-slate-600 mt-0.5">
+                  予算を設定した予定を「完了」にすると、自動でコインが得られるだけでなく、かかった予算分がお魚資金から引かれるにゃ！とても楽ちんだにゃん🐾
+                </p>
+              </div>
+
+              {plans.length === 0 ? (
+                <div className="py-12 text-center text-slate-400 text-xs">
+                  まだ予定はないにゃ。「きょうの提案」を登録するか、AIにねだってみてにゃ🐾
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {plans.map((plan) => (
+                    <div 
+                      key={plan.id}
+                      className={`p-4 rounded-2xl border flex items-start justify-between transition ${
+                        plan.status === 'completed' 
+                          ? 'bg-slate-50/70 border-slate-200 opacity-75' 
+                          : 'bg-white border-orange-100 shadow-xs'
+                      }`}
+                    >
+                      <div className="flex items-start space-x-3 flex-1">
+                        <button 
+                          onClick={() => togglePlanStatus(plan.id)}
+                          className={`mt-0.5 p-1 rounded-full border transition ${
+                            plan.status === 'completed'
+                              ? 'bg-orange-400 border-orange-400 text-white'
+                              : 'border-slate-300 hover:border-orange-400 bg-white text-transparent'
+                          }`}
+                        >
+                          <CheckCircle className="w-5 h-5" />
+                        </button>
+                        <div>
+                          <h3 className={`font-black text-sm ${plan.status === 'completed' ? 'line-through text-slate-400' : 'text-slate-900'}`}>
+                            {plan.title}
+                          </h3>
+                          <p className={`text-[11px] mt-1 leading-relaxed ${plan.status === 'completed' ? 'text-slate-400' : 'text-slate-600'}`}>
+                            {plan.description}
+                          </p>
+                          <div className="mt-2 flex gap-2 text-[9px] text-slate-500 font-bold">
+                            <span>🕒 {plan.duration}</span>
+                            <span>💰 {plan.budget === 0 ? '無料' : `¥${plan.budget.toLocaleString()}`}</span>
+                            <span>📍 {plan.category}</span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <button 
+                        onClick={() => handleDeletePlan(plan.id)}
+                        className="text-slate-400 hover:text-rose-500 p-1.5 rounded"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 5. にゃんこショップ ＆ 着せ替えルーム */}
+        {activeTab === 'shop' && (
+          <div className="space-y-6">
+            
+            {/* 🛍️ ショップセクション */}
+            <div className="bg-white p-6 rounded-3xl border-4 border-orange-100 shadow-xs">
+              <div className="flex items-center justify-between mb-5 border-b-2 border-orange-50 pb-3">
+                <div className="flex items-center space-x-2">
+                  <ShoppingBag className="text-orange-400 w-5 h-5" />
+                  <h2 className="font-black text-orange-950 text-base">またたびショップ 🐾</h2>
+                </div>
+                <div className="bg-amber-50 border-2 border-amber-200 px-3 py-1 rounded-full text-xs font-black text-amber-800">
+                  🪙 手持ち: {matatabiCoins} コイン
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {shopItems.map((item) => {
+                  const isBought = purchasedItems[item.key];
+                  const isEquipped = equippedItems[item.key];
+                  
+                  return (
+                    <div key={item.key} className="bg-slate-50/50 border-2 border-orange-100/50 p-4 rounded-2xl flex flex-col justify-between space-y-3 hover:border-orange-200 transition">
+                      <div className="space-y-1">
+                        <span className="text-xs bg-orange-100 text-orange-800 font-black px-2 py-0.5 rounded-full">
+                          アイテム
+                        </span>
+                        <h4 className="font-black text-slate-900 text-sm">{item.name}</h4>
+                        <p className="text-[11px] text-slate-500 font-bold leading-relaxed">{item.desc}</p>
+                      </div>
+
+                      <div className="pt-2 flex items-center justify-between">
+                        {!isBought ? (
+                          <>
+                            <span className="text-xs font-black text-amber-700">🪙 {item.cost} コイン</span>
+                            <button
+                              onClick={() => handleBuyItem(item)}
+                              disabled={matatabiCoins < item.cost}
+                              className="bg-orange-400 hover:bg-orange-500 disabled:bg-slate-200 text-white text-[10px] font-black px-3.5 py-2 rounded-xl transition shadow-xs"
+                            >
+                              購入にゃ🐾
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <span className="text-xs font-black text-emerald-600">購入済みにゃ🐾</span>
+                            <button
+                              onClick={() => handleToggleEquip(item.key)}
+                              className={`text-[10px] font-black px-3.5 py-2 rounded-xl transition border-2 ${
+                                isEquipped 
+                                  ? 'bg-rose-50 border-rose-300 text-rose-700' 
+                                  : 'bg-white border-orange-200 text-orange-950 hover:bg-orange-50'
+                              }`}
+                            >
+                              {isEquipped ? "外すにゃ" : "着せるにゃ🐾"}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ❤️ なつき度・称号ルーム */}
+            <div className="bg-white p-6 rounded-3xl border-4 border-orange-100 shadow-xs text-center md:text-left">
+              <h3 className="font-black text-orange-950 text-base mb-4 flex items-center justify-center md:justify-start gap-1">
+                🏆 あなたのみけなつきステータス
+              </h3>
+
+              <div className="flex flex-col md:flex-row items-center gap-6">
+                <div className="text-5xl shrink-0 p-3 bg-rose-50 border-2 border-rose-200 rounded-3xl">
+                  🥇
+                </div>
+                <div className="space-y-1.5 flex-1">
+                  <p className="text-sm font-black text-slate-800">
+                    現在の称号：
+                    <span className="text-rose-600 bg-rose-50 border border-rose-200 px-3 py-1 rounded-xl ml-2 inline-block">
+                      {affectionLevel === 1 ? "みけなじみの見習い 🐾" : affectionLevel === 2 ? "気心の知れた相棒にゃ🐾" : affectionLevel === 3 ? "お膝の特等席オーナー❤️" : "一生の愛の誓いキャット尊厳愛❤️"}
+                    </span>
+                  </p>
+                  <p className="text-xs text-slate-500 font-bold leading-relaxed">
+                    日記を継続したり、ガチャを回したり、予定を完了させることでなつき度がグングン上昇しますにゃ。なつきレベルが上がるたびに、ショップを訪れると、みけちゃんの反応がどんどんデレデレに甘えるようになっていくにゃん🐾
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 5. 統計分析タブ */}
+        {activeTab === 'stats' && (
+          <div className="space-y-6">
+            <div className="bg-white p-5 rounded-3xl border border-orange-100/70 shadow-xs">
+              <div className="flex items-center space-x-2 mb-6">
+                <PieChart className="text-orange-400 w-5 h-5" />
+                <h2 className="font-black text-orange-950 text-sm">ココロとお魚資金の統計分析🐾</h2>
+              </div>
+
+              {/* 収支割合 */}
+              <div className="mb-6 space-y-4">
+                <h3 className="font-black text-xs text-slate-700">おサイフの使われ方（今月）</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { key: 'entertainment', label: '娯楽・暇つぶし', color: 'bg-orange-400' },
+                    { key: 'food', label: 'ご飯・カフェ', color: 'bg-emerald-400' },
+                    { key: 'shopping', label: 'おもちゃ・雑貨', color: 'bg-amber-400' },
+                    { key: 'other', label: 'その他にゃ', color: 'bg-slate-400' }
+                  ].map((cat) => {
+                    const totalExpense = Object.values(stats.categoryExpenses).reduce((a, b) => a + b, 0);
+                    const amount = stats.categoryExpenses[cat.key] || 0;
+                    const percent = totalExpense > 0 ? Math.round((amount / totalExpense) * 100) : 0;
+                    return (
+                      <div key={cat.key} className="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                        <span className="text-[10px] text-slate-500 font-bold block">{cat.label}</span>
+                        <p className="text-xs font-black text-slate-900 mt-1">¥{amount.toLocaleString()}</p>
+                        <div className="w-full bg-slate-200 h-1.5 rounded-full mt-2 overflow-hidden">
+                          <div className={`h-full ${cat.color}`} style={{ width: `${percent}%` }}></div>
+                        </div>
+                        <span className="text-[8px] text-slate-400 font-bold mt-1 block">{percent}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 気分のブレ幅 */}
+              <div className="space-y-4">
+                <h3 className="font-black text-xs text-slate-700">にゃんこ気分の履歴🐾</h3>
+                <div className="space-y-3">
+                  {[
+                    { key: 'happy', label: '元気ハッピー 😺', count: stats.moodCounts.happy, barColor: 'bg-emerald-400' },
+                    { key: 'normal', label: 'まったり通常 😸', count: stats.moodCounts.normal, barColor: 'bg-orange-400' },
+                    { key: 'tired', label: 'くたくただらん 😿', count: stats.moodCounts.tired, barColor: 'bg-amber-400' },
+                    { key: 'sad', label: 'しょんぼり 🥺', count: stats.moodCounts.sad, barColor: 'bg-blue-400' }
+                  ].map((moodStat) => {
+                    const percentage = stats.totalDiaries > 0 ? Math.round((moodStat.count / stats.totalDiaries) * 100) : 0;
+                    return (
+                      <div key={moodStat.key} className="space-y-1">
+                        <div className="flex justify-between text-[11px] font-black text-slate-700">
+                          <span>{moodStat.label}</span>
+                          <span>{moodStat.count}回 ({percentage}%)</span>
+                        </div>
+                        <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                          <div 
+                            className={`h-full ${moodStat.barColor} transition-all`}
+                            style={{ width: `${percentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* フッタータブナビゲーション */}
+      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-orange-100 z-40 shadow-lg pb-1.5">
+        <div className="max-w-md mx-auto px-4 py-2 flex justify-between">
+          {[
+            { id: 'diary', icon: <BookOpen className="w-5 h-5" />, label: '猫日誌' },
+            { id: 'wallet', icon: <Wallet className="w-5 h-5" />, label: 'お魚資金' },
+            { id: 'plan', icon: <Compass className="w-5 h-5" />, label: '猫にねだる' },
+            { id: 'history', icon: <Calendar className="w-5 h-5" />, label: '猫予定' },
+            { id: 'shop', icon: <ShoppingBag className="w-5 h-5" />, label: '猫ショップ' },
+            { id: 'stats', icon: <PieChart className="w-5 h-5" />, label: '分析' }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex flex-col items-center justify-center p-2.5 transition-all ${
+                activeTab === tab.id 
+                  ? 'text-orange-500 scale-105 font-black' 
+                  : 'text-slate-400 hover:text-slate-600'
+              }`}
+            >
+              {tab.icon}
+              <span className="text-[9px] mt-1 tracking-tight font-black">{tab.label}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
+    </div>
+  );
+}
+コミットしてからプッシュして
